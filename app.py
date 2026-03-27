@@ -58,7 +58,7 @@ def delete_file_if_scheduled():
 # --- ダウンロードボタンのコールバック関数 (変更なし) ---
 def schedule_file_deletion(file_path):
     """ダウンロードボタンクリック時に、次の実行で削除するファイルをスケジュール"""
-    st.session_state.file_to_delete_on_next_run = file_path
+    # st.session_state.file_to_delete_on_next_run = file_path
 
 # --- ★★★ 新しい関数：ログインログ記録 ★★★ ---
 def log_login_event():
@@ -198,7 +198,7 @@ def main():
                     with open(file_path, "rb") as fp:
                         file_data = fp.read()
                     st.download_button(
-                        label=f"'{selected_file}' をダウンロード (ダウンロード後削除)",
+                        label=f"'{selected_file}' をダウンロード",
                         data=file_data,
                         file_name=selected_file,
                         mime='application/octet-stream',
@@ -206,7 +206,7 @@ def main():
                         on_click=schedule_file_deletion,
                         args=(file_path,)
                     )
-                    st.caption("ボタンをクリックするとダウンロードが開始され、その後ファイルはサーバーから削除されます。")
+                    st.caption("ボタンをクリックするとダウンロードが開始されます。")
                 except FileNotFoundError:
                      st.warning(f"ファイル '{selected_file}' を読み込もうとしましたが、見つかりませんでした。リストを更新します。", icon="⚠️")
                      time.sleep(1)
