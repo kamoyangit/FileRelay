@@ -60,6 +60,16 @@ def schedule_file_deletion(file_path):
     """ダウンロードボタンクリック時に、次の実行で削除するファイルをスケジュール"""
     # st.session_state.file_to_delete_on_next_run = file_path
 
+# --- 手動で選択したファイルを即座に削除する関数 ---
+def delete_selected_file(file_path):
+    """選択されたファイルを即時に削除します"""
+    try:
+        os.remove(file_path)
+        st.success(f"ファイル '{os.path.basename(file_path)}' を削除しました。", icon="✅")
+        st.rerun()
+    except Exception as e:
+        st.error(f"ファイル '{os.path.basename(file_path)}' の削除中にエラーが発生しました: {e}")
+
 # --- ★★★ 新しい関数：ログインログ記録 ★★★ ---
 def log_login_event():
     """ログイン成功イベントをログファイルに記録する"""
@@ -207,22 +217,20 @@ def main():
                         args=(file_path,)
                     )
                     st.caption("ボタンをクリックするとダウンロードが開始されます。")
-                except FileNotFoundError:
-                     st.warning(f"ファイル '{selected_file}' を読み込もうとしましたが、見つかりませんでした。リストを更新します。", icon="⚠️")
-                     time.sleep(1)
-                     st.rerun()
-                except Exception as e:
-                    st.error(f"ファイル '{selected_file}' の処理中にエラーが発生しました: {e}")
-            else:
-                st.warning(f"選択されたファイル '{selected_file}' は見つかりませんでした。リストを更新します。", icon="⚠️")
-                if st.session_state.selected_file_to_download == selected_file:
-                    st.session_state.selected_file_to_download = "---"
-                time.sleep(1)
-                st.rerun()
+                except Exception as e:                                                      
+                      st.error(f"ファイル '{selected_file}' の処理中にエラーが発生しました:   {e}")  
 
-    # --- 5. ★★★ ログインログ表示 ★★★ ---
-    display_login_log() # アプリケーションの最後にログを表示
-
+    # --- 手動ファイル削除 UI ---
+    if files:
+        file_to_delete = st.selectbox(
+            "削除したいファイルを選択してください",
+            options=["---"] + files,
+            key="file_to_delete_select"
+        )
+        if file_to_delete != "---":
+            delete_path = os.path.join(UPLOAD_DIR, file_to_delete)
+            if st.button("削除"):
+                delete_selected_file(delete_path)
 
 # --- アプリケーション実行のエントリポイント (変更なし) ---
 if __name__ == "__main__":
